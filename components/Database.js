@@ -16,10 +16,17 @@ export class Database extends Component {
 
         db.transaction(
             tx => {
-                tx.executeSql("INSERT INTO budziki (time, state, mon, tue, wed, thu, fri, sat, sun) values ('12:45', 1, 1, 1, 1, 0, 1, 1, 1)");
+                tx.executeSql("INSERT INTO budziki (time, state, mon, tue, wed, thu, fri, sat, sun) values ('00:00', 0, 0, 0, 0, 0, 0, 0, 0)");
             },
         )
         console.log('added')
+    }
+    static update(data) {
+        var query = "UPDATE budziki SET time = '" + data.time + "', state = " + data.state + ", mon = " + data.mon + ", tue = " + data.tue + ", wed = " + data.wed + ", thu = " + data.thu + ", fri = " + data.fri + ", sat = " + data.sat + ", sun = " + data.sun + " WHERE id = " + data.id + ";"
+        console.log(query)
+        db.transaction(tx => { tx.executeSql(query) },)
+        console.log('updated ' + data.id)
+
     }
     static getAll() {
         var query = "SELECT * FROM budziki";
@@ -32,10 +39,10 @@ export class Database extends Component {
             });
         }))
     }
-    static remove() {
+    static remove(id) {
         db.transaction(tx => {
             tx.executeSql(
-                "DELETE FROM budziki WHERE (id = 0);"
+                "DELETE FROM budziki WHERE (id = " + id + ");"
             );
         });
 

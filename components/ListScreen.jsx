@@ -12,21 +12,21 @@ export default class ListScreen extends Component {
         }
     }
     componentDidMount() {
-
+        //Database.dropTable()
         Database.createTable();
-
+        //Database.add()
     }
-    changeFlag() {
-        this.setState({ flag: false })
+    changeFlag(flag) {
+        this.setState({ flag: flag })
     }
     render() {
         return (
             <View style={styles.main}>
                 <ScrollView >
-                    <AlarmList changeFlag={this.state.flag} />
+                    <AlarmList changeFlag={this.state.flag} callback={this.changeFlag.bind(this)} />
                 </ScrollView>
                 <TouchableOpacity
-                    onPress={() => { () => { Database.add(); }/*this.props.navigation.navigate("add") */ }}
+                    onPress={ () => { console.log('dodawanie');;Database.add(); window.setTimeout(() => { this.setState({flag:true}) }, 400) }/*this.props.navigation.navigate("add") */ }
                     style={styles.addButton}>
                     <Text style={styles.text}>✚</Text>
                 </TouchableOpacity>

@@ -6,8 +6,9 @@ export default class Alarm extends Component {
     constructor(props) {
         super(props)
         this.state = {
+            id: this.props.data.id,
             time: this.props.data.time,
-            toggled: this.props.data.toggled,
+            toggled: this.props.data.state,
             mon: this.props.data.mon,
             tue: this.props.data.tue,
             wed: this.props.data.wed,
@@ -21,10 +22,28 @@ export default class Alarm extends Component {
         this.toValue = 0
     }
     componentDidUpdate(prevProps, prevState) {
+        if (prevState != this.state && this.state.expanded == prevState.expanded) {
+            console.log('state update');
+            console.log(this.state)
 
+            let alarmData = {
+                id: this.state.id,
+                time: this.state.time,
+                state: this.state.toggled,
+                mon: this.state.mon,
+                tue: this.state.tue,
+                wed: this.state.wed,
+                thu: this.state.thu,
+                fri: this.state.fri,
+                sat: this.state.sat,
+                sun: this.state.sun
+            }
+
+            Database.update(alarmData)
+        }
     }
     toggle() {
-        //Database.dropTable()
+
         //Database.add()
         if (!this.state.expanded) this.toValue = 120
         else this.toValue = 0
@@ -37,22 +56,13 @@ export default class Alarm extends Component {
     dayUpdate(day) {
         console.log(this.state[day])
         console.log(day)
-        this.setState({ [day]: this.state[day] == 0 ? 1 : 0 }).then(() => {
-            console.log(this.state[day])
+        this.setState({ [day]: this.state[day] == 0 ? 1 : 0 })
 
-            let alarmData = {
-                time: this.state.time,
-                toggled: this.state.toggled,
-                mon: this.state.mon,
-                tue: this.state.tue,
-                wed: this.state.wed,
-                thu: this.state.thu,
-                fri: this.state.fri,
-                sat: this.state.sat,
-                sun: this.state.sun
-            }
-        })
-
+    }
+    delete() {
+        console.log('deleting')
+        Database.remove(this.state.id)
+        window.setTimeout(() => { this.props.callback(true) }, 200)
     }
     render() {
         const styles = StyleSheet.create({
@@ -83,20 +93,34 @@ export default class Alarm extends Component {
             week: {
                 flexDirection: 'row',
                 display: this.state.expanded ? 'flex' : 'none',
-                marginTop: 60
+                marginTop: 60,
             },
             daytext: {
                 color: 'white',
-                fontSize: 20,
-                padding: 10
+                fontSize: 16,
+                padding: 0,
+                textAlign:'center',
+                justifyContent:'center',
+                paddingVertical:10
             },
             dayButtonTrue: {
                 borderRadius: 25,
                 backgroundColor: '#23272A',
+                height:40,
+                width:40
             },
             dayButtonFalse: {
                 borderRadius: 25,
                 backgroundColor: 'rgba(0,0,0,0)',
+                height:40,
+                width:40
+            },
+            overview: {
+                display: this.state.expanded ? 'none' : 'flex',
+                height: this.state.expanded ? 0 : 25,
+                marginTop: 10,
+                fontSize: 22,
+                color: '#F6F6F6'
             }
         })
 
@@ -104,11 +128,11 @@ export default class Alarm extends Component {
             <View style={styles.main} onLayout={(event) => { if (false) { this.setState({ height: new Animated.Value(event.nativeEvent.layout.height) }); console.log(event.nativeEvent.layout.height) } }} >
                 <View style={styles.row}>
                     <Text style={styles.text}> {this.state.time} </Text>
-                    <Switch onValueChange={() => { this.setState({ toggled: !this.state.toggled }) }} trackColor={{ false: "#99AAB5", true: "#F6F6F6" }} thumbColor={this.state.toggled ? "#404EED" : "#23272A"} value={this.state.toggled}></Switch>
+                    <Switch onValueChange={() => { this.setState({ toggled: this.state.toggled == 1 ? 0 : 1 }) }} trackColor={{ false: "#99AAB5", true: "#F6F6F6" }} thumbColor={this.state.toggled ? "#404EED" : "#23272A"} value={this.state.toggled==1?true:false}></Switch>
                 </View>
 
                 <View style={styles.row}>
-                    <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple('rgba(153,170,181,1)', true)} onPress={() => { }}>
+                    <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple('rgba(153,170,181,1)', true)} onPress={() => { this.delete() }}>
                         <View><Image style={styles.trashImg} source={require('../assets/trash.png')} /></View>
                     </TouchableNativeFeedback>
                     <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple('rgba(153,170,181,1)', true)} onPress={() => { this.toggle() }}>
@@ -130,6 +154,7 @@ export default class Alarm extends Component {
                         <TouchableOpacity onPress={() => { this.dayUpdate('sun') }} style={this.state.sun == 1 ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>ND</Text></TouchableOpacity>
                     </View>
                 </Animated.View>
+                <Text style={styles.overview}>{(this.state.mon == 1 ? 'Pn ' : '') + (this.state.tue == 1 ? 'Wt ' : '') + (this.state.wed == 1 ? 'Śr ' : '') + (this.state.thu == 1 ? 'Czw ' : '') + (this.state.fri == 1 ? 'Pt ' : '') + (this.state.sat == 1 ? 'Sb ' : '') + (this.state.sun == 1 ? 'Nd' : '')}</Text>
                 <Line />
             </View>
         )

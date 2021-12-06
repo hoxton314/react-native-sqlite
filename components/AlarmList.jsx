@@ -7,7 +7,8 @@ export default class AlarmList extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            data: []
+            data: [],
+            //updateFlag:this.props,
         }
 
     }
@@ -15,20 +16,27 @@ export default class AlarmList extends Component {
         let arr = []
         this.state.data.map((alarm) => {
             console.log(alarm)
-            arr.push(<Alarm key={alarm.id} data={alarm} />)
+            arr.push(<Alarm key={alarm.id} data={alarm} callback={this.props.callback}/>)
         })
         return arr
     }
-    componentDidUpdate() {
-
+    componentDidUpdate(prevProps) {
+        if(prevProps.changeFlag!=this.props.changeFlag && this.props.changeFlag){
+            this.getData()
+        }
     }
     componentDidMount() {
+       this.getData()
+    }
+    getData(){
         Database.getAll().then((all) => {
 
             console.log('SQLite Data')
             console.log(JSON.parse(all).rows._array)
             console.log('===============');
             this.setState({ data: JSON.parse(all).rows._array })
+
+            this.props.callback(false)
         })
     }
     render() {
