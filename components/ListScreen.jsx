@@ -1,7 +1,16 @@
 import React, { Component } from 'react'
 import { Text, StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native'
 import AlarmList from './AlarmList'
+import Database from "./Database";
+
+
 export default class ListScreen extends Component {
+    componentDidMount() {
+
+        Database.createTable();
+    
+    }
+    
     render() {
         return (
             <View style={styles.main}>
