@@ -8,7 +8,7 @@ export class Database extends Component {
     static createTable() {
         db.transaction(tx => {
             tx.executeSql(
-                "CREATE TABLE IF NOT EXISTS budziki (id integer primary key not null, time text, state bool, mon bool, tue bool, wed bool, thu bool, fri bool, sat bool, sun bool);"
+                "CREATE TABLE IF NOT EXISTS budziki (id integer primary key not null, time text, state integer, mon integer, tue integer, wed integer, thu integer, fri integer, sat integer, sun integer);"
             );
         });
     }
@@ -16,7 +16,7 @@ export class Database extends Component {
 
         db.transaction(
             tx => {
-                tx.executeSql("INSERT INTO budziki (time, state, mon, tue, wed, thu, fri, sat, sun) values ('12:45', true, true, true, true, false, true, true, true)");
+                tx.executeSql("INSERT INTO budziki (time, state, mon, tue, wed, thu, fri, sat, sun) values ('12:45', 1, 1, 1, 1, 0, 1, 1, 1)");
             },
         )
         console.log('added')
@@ -38,13 +38,20 @@ export class Database extends Component {
                 "DELETE FROM budziki WHERE (id = 0);"
             );
         });
-    
+
     }
     static removeAll() {
 
         db.transaction(tx => {
             tx.executeSql(
                 "DELETE FROM budziki ;"
+            );
+        });
+    }
+    static dropTable() {
+        db.transaction(tx => {
+            tx.executeSql(
+                "DROP TABLE budziki;"
             );
         });
     }

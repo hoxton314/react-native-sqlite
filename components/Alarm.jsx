@@ -8,7 +8,13 @@ export default class Alarm extends Component {
         this.state = {
             time: this.props.data.time,
             toggled: this.props.data.toggled,
-            week: this.props.data.week,
+            mon: this.props.data.mon,
+            tue: this.props.data.tue,
+            wed: this.props.data.wed,
+            thu: this.props.data.thu,
+            fri: this.props.data.fri,
+            sat: this.props.data.sat,
+            sun: this.props.data.sun,
             height: new Animated.Value(0), // początkowa wartość wysokości itema
             expanded: false,
         }
@@ -18,15 +24,8 @@ export default class Alarm extends Component {
 
     }
     toggle() {
-        Database.add()
-        Database.getAll().then((all) => {
-
-            console.log('SQLite')
-            console.log(JSON.parse(all))
-
-        })
-
-        console.log(this.state.week)
+        //Database.dropTable()
+        //Database.add()
         if (!this.state.expanded) this.toValue = 120
         else this.toValue = 0
         Animated.spring(this.state.height, {
@@ -36,11 +35,24 @@ export default class Alarm extends Component {
         this.setState({ expanded: !this.state.expanded })
     }
     dayUpdate(day) {
-        console.log(this.props.data.week[day])
+        console.log(this.state[day])
         console.log(day)
-        this.props.data.week[day] = !this.props.data.week[day]
-        console.log(this.props.data.week[day])
-        this.setState({ week: this.props.data.week })
+        this.setState({ [day]: this.state[day] == 0 ? 1 : 0 }).then(() => {
+            console.log(this.state[day])
+
+            let alarmData = {
+                time: this.state.time,
+                toggled: this.state.toggled,
+                mon: this.state.mon,
+                tue: this.state.tue,
+                wed: this.state.wed,
+                thu: this.state.thu,
+                fri: this.state.fri,
+                sat: this.state.sat,
+                sun: this.state.sun
+            }
+        })
+
     }
     render() {
         const styles = StyleSheet.create({
@@ -109,13 +121,13 @@ export default class Alarm extends Component {
                     //backgroundColor: "#FF0000",
                 }} >
                     <View style={styles.week}>
-                        <TouchableOpacity onPress={() => { this.dayUpdate('mon') }} style={this.state.week.mon ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>PN</Text></TouchableOpacity>
-                        <TouchableOpacity onPress={() => { this.dayUpdate('tue') }} style={this.state.week.tue ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>WT</Text></TouchableOpacity>
-                        <TouchableOpacity onPress={() => { this.dayUpdate('wed') }} style={this.state.week.wed ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>ŚR</Text></TouchableOpacity>
-                        <TouchableOpacity onPress={() => { this.dayUpdate('thu') }} style={this.state.week.thu ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>CZ</Text></TouchableOpacity>
-                        <TouchableOpacity onPress={() => { this.dayUpdate('fri') }} style={this.state.week.fri ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>PT</Text></TouchableOpacity>
-                        <TouchableOpacity onPress={() => { this.dayUpdate('sat') }} style={this.state.week.sat ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>SB</Text></TouchableOpacity>
-                        <TouchableOpacity onPress={() => { this.dayUpdate('sun') }} style={this.state.week.sun ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>ND</Text></TouchableOpacity>
+                        <TouchableOpacity onPress={() => { this.dayUpdate('mon') }} style={this.state.mon == 1 ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>PN</Text></TouchableOpacity>
+                        <TouchableOpacity onPress={() => { this.dayUpdate('tue') }} style={this.state.tue == 1 ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>WT</Text></TouchableOpacity>
+                        <TouchableOpacity onPress={() => { this.dayUpdate('wed') }} style={this.state.wed == 1 ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>ŚR</Text></TouchableOpacity>
+                        <TouchableOpacity onPress={() => { this.dayUpdate('thu') }} style={this.state.thu == 1 ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>CZ</Text></TouchableOpacity>
+                        <TouchableOpacity onPress={() => { this.dayUpdate('fri') }} style={this.state.fri == 1 ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>PT</Text></TouchableOpacity>
+                        <TouchableOpacity onPress={() => { this.dayUpdate('sat') }} style={this.state.sat == 1 ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>SB</Text></TouchableOpacity>
+                        <TouchableOpacity onPress={() => { this.dayUpdate('sun') }} style={this.state.sun == 1 ? styles.dayButtonTrue : styles.dayButtonFalse}><Text style={styles.daytext}>ND</Text></TouchableOpacity>
                     </View>
                 </Animated.View>
                 <Line />

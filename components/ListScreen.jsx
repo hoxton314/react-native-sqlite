@@ -5,20 +5,28 @@ import Database from "./Database";
 
 
 export default class ListScreen extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            flag: false
+        }
+    }
     componentDidMount() {
 
         Database.createTable();
-    
+
     }
-    
+    changeFlag() {
+        this.setState({ flag: false })
+    }
     render() {
         return (
             <View style={styles.main}>
                 <ScrollView >
-                    <AlarmList />
+                    <AlarmList changeFlag={this.state.flag} />
                 </ScrollView>
                 <TouchableOpacity
-                    onPress={() => { this.props.navigation.navigate("add") }}
+                    onPress={() => { () => { Database.add(); }/*this.props.navigation.navigate("add") */ }}
                     style={styles.addButton}>
                     <Text style={styles.text}>✚</Text>
                 </TouchableOpacity>
