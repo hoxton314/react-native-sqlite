@@ -26,7 +26,7 @@ export default class ListScreen extends Component {
                     <AlarmList changeFlag={this.state.flag} callback={this.changeFlag.bind(this)} />
                 </ScrollView>
                 <TouchableOpacity
-                    onPress={ () => { console.log('dodawanie');;Database.add(); window.setTimeout(() => { this.setState({flag:true}) }, 400) }/*this.props.navigation.navigate("add") */ }
+                    onPress={() => { this.props.navigation.navigate("add", { callback: this.changeFlag.bind(this) }) }}
                     style={styles.addButton}>
                     <Text style={styles.text}>✚</Text>
                 </TouchableOpacity>
