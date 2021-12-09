@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, Switch, TouchableOpacity, Dimensions, Image, TouchableNativeFeedback, Animated } from 'react-native'
+import { Text, StyleSheet, View, Switch, TouchableOpacity, Dimensions, Image, TouchableNativeFeedback, Animated, Vibration } from 'react-native'
+import { Audio } from 'expo-av';
 import Line from './Line'
 import Database from "./Database";
 export default class Alarm extends Component {
@@ -9,6 +10,7 @@ export default class Alarm extends Component {
             id: this.props.data.id,
             time: this.props.data.time,
             toggled: this.props.data.state,
+            sound: this.props.data.sound,
             mon: this.props.data.mon,
             tue: this.props.data.tue,
             wed: this.props.data.wed,
@@ -18,8 +20,46 @@ export default class Alarm extends Component {
             sun: this.props.data.sun,
             height: new Animated.Value(0), // początkowa wartość wysokości itema
             expanded: false,
+            loopFlag: true,
+            isPlaying: false
         }
+        this.timeCheck()
         this.toValue = 0
+        this.audioPlayer = new Audio.Sound();
+    }
+    async timeCheck() {
+        //let audioClip = new Audio.Sound();
+        //var play_yes = await Audio.Sound.createAsync(require('../assets/ring.mp3'),{ shouldPlay: false })
+        //const { sound } = await Audio.Sound.createAsync(require('../assets/ring.mp3'));
+        let audioPlayer = new Audio.Sound();
+        await audioPlayer.unloadAsync()
+        await audioPlayer.loadAsync(require('../assets/ring.mp3'));
+
+        while (this.state.loopFlag) {
+            let date = new Date
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            console.log('time checking ', this.state.time, ((date.getHours().toString().length == 1 ? '0' + date.getHours() : date.getHours()) + ':' + date.getMinutes()))
+            if (((date.getHours().toString().length == 1 ? '0' + date.getHours() : date.getHours()) + ':' + date.getMinutes()) == this.state.time) {
+                console.log('dzwoni')
+                if (this.state.toggled == 1) {
+                    Vibration.vibrate()
+                    console.log('vibration')
+                }
+                if (this.state.sound == 1) {
+                    if (!this.state.isPlaying) {
+                        console.log('music start')
+                        this.setState({ isPlaying: true })
+                        //play music
+                        await audioPlayer.playAsync();
+                    }
+                } else {
+                    this.setState({ isPlaying: false })
+                    //stop music
+                    await audioPlayer.pauseAsync();
+                }
+            }
+
+        }
     }
     componentDidUpdate(prevProps, prevState) {
         if (prevState != this.state && this.state.expanded == prevState.expanded) {
@@ -30,6 +70,7 @@ export default class Alarm extends Component {
                 id: this.state.id,
                 time: this.state.time,
                 state: this.state.toggled,
+                sound: this.state.sound,
                 mon: this.state.mon,
                 tue: this.state.tue,
                 wed: this.state.wed,
@@ -60,6 +101,7 @@ export default class Alarm extends Component {
 
     }
     delete() {
+        this.setState({ loopFlag: false })
         console.log('deleting')
         Database.remove(this.state.id)
         window.setTimeout(() => { this.props.callback(true) }, 200)
@@ -99,21 +141,21 @@ export default class Alarm extends Component {
                 color: 'white',
                 fontSize: 16,
                 padding: 0,
-                textAlign:'center',
-                justifyContent:'center',
-                paddingVertical:10
+                textAlign: 'center',
+                justifyContent: 'center',
+                paddingVertical: 10
             },
             dayButtonTrue: {
                 borderRadius: 25,
                 backgroundColor: '#23272A',
-                height:40,
-                width:40
+                height: 40,
+                width: 40
             },
             dayButtonFalse: {
                 borderRadius: 25,
                 backgroundColor: 'rgba(0,0,0,0)',
-                height:40,
-                width:40
+                height: 40,
+                width: 40
             },
             overview: {
                 display: this.state.expanded ? 'none' : 'flex',
@@ -125,10 +167,13 @@ export default class Alarm extends Component {
         })
 
         return (
-            <View style={styles.main} onLayout={(event) => { if (false) { this.setState({ height: new Animated.Value(event.nativeEvent.layout.height) }); console.log(event.nativeEvent.layout.height) } }} >
+            <View style={styles.main} >
                 <View style={styles.row}>
                     <Text style={styles.text}> {this.state.time} </Text>
-                    <Switch onValueChange={() => { this.setState({ toggled: this.state.toggled == 1 ? 0 : 1 }) }} trackColor={{ false: "#99AAB5", true: "#F6F6F6" }} thumbColor={this.state.toggled ? "#404EED" : "#23272A"} value={this.state.toggled==1?true:false}></Switch>
+                    <View>
+                        <Switch onValueChange={() => { this.setState({ toggled: this.state.toggled == 1 ? 0 : 1 }) }} trackColor={{ false: "#99AAB5", true: "#F6F6F6" }} thumbColor={this.state.toggled ? "#404EED" : "#23272A"} value={this.state.toggled == 1 ? true : false}></Switch>
+                        <Switch onValueChange={() => { this.setState({ sound: this.state.sound == 1 ? 0 : 1 }) }} trackColor={{ false: "#99AAB5", true: "#F6F6F6" }} thumbColor={this.state.sound ? "#404EED" : "#23272A"} value={this.state.sound == 1 ? true : false}></Switch>
+                    </View>
                 </View>
 
                 <View style={styles.row}>

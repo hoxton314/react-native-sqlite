@@ -16,19 +16,19 @@ export default class AlarmList extends Component {
         let arr = []
         this.state.data.map((alarm) => {
             console.log(alarm)
-            arr.push(<Alarm key={alarm.id} data={alarm} callback={this.props.callback}/>)
+            arr.push(<Alarm key={alarm.id} data={alarm} callback={this.props.callback} />)
         })
         return arr
     }
     componentDidUpdate(prevProps) {
-        if(prevProps.changeFlag!=this.props.changeFlag && this.props.changeFlag){
+        if (prevProps.changeFlag != this.props.changeFlag && this.props.changeFlag) {
             this.getData()
         }
     }
     componentDidMount() {
-       this.getData()
+        this.getData()
     }
-    getData(){
+    getData() {
         Database.getAll().then((all) => {
 
             console.log('SQLite Data')
@@ -42,10 +42,7 @@ export default class AlarmList extends Component {
     render() {
         return (
             <View>
-                {/* <Alarm data={{ time: '12:00', toggled: true, week: { mon: true, tue: false, wed: false, thu: false, fri: true, sat: false, sun: false } }} />
-                <Alarm data={{ time: '17:00', toggled: false, week: { mon: true, tue: false, wed: true, thu: false, fri: true, sat: false, sun: false } }} />
-                <Alarm data={{ time: '19:45', toggled: false, week: { mon: true, tue: true, wed: false, thu: false, fri: true, sat: false, sun: false } }} />
-                <Alarm data={{ time: '6:30', toggled: true, week: { mon: false, tue: false, wed: false, thu: false, fri: true, sat: false, sun: false } }} /> */}
+
                 {this.mapping()}
             </View>
         )
